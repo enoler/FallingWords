@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Babbel</string>
+
+    <string name="suggested_word">Suggested Word</string>
+    <string name="falling_word">Falling Word</string>
+
+    <string name="time">Time</string>
+</resources>
