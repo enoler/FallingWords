@@ -1,4 +1,4 @@
-package es.enoler.babbel;
+package es.enoler.babbel.activities;
 
 import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import es.enoler.babbel.R;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
