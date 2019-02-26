@@ -1,45 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:background="#0099cc"
-              android:orientation="vertical"
-             tools:context=".activities.GameActivity">
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="#0099cc"
+        android:orientation="vertical"
+        tools:context=".activities.GameActivity">
 
-    <RelativeLayout android:id="@+id/fullscreen_content_controls"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:padding="12dp"
-                    android:background="@color/black_overlay">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/rl_top_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:padding="15dp"
+            android:background="@color/black_overlay">
 
-        <TextView android:id="@+id/tv_suggested_word"
+        <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/tv_suggested_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"
+                android:text="@string/falling_word"/>
+
+        <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/tv_countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:layout_centerVertical="true"
+                android:textSize="15sp"
+                android:visibility="gone"
+                android:text="@string/time"/>
+
+        <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/tv_points"
+                android:visibility="gone"
+                android:gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:layout_centerVertical="true"
+                android:textSize="15sp"
+                android:text="@string/points"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+            app:layout_constraintTop_toBottomOf="@+id/rl_top_container"
+            app:layout_constraintBottom_toTopOf="@+id/ll_bottom_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rl_main_container">
+
+        <TextView android:id="@+id/tv_falling_word"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textColor="@android:color/white"
-                  android:textSize="20sp"
-                  android:textStyle="bold"
+                  android:keepScreenOn="true"
                   android:layout_centerHorizontal="true"
-                  android:text="@string/suggested_word"/>
-
-        <TextView android:id="@+id/tv_countdown"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
                   android:textColor="@android:color/white"
-                  android:layout_centerVertical="true"
-                  android:textSize="15sp"
-                  android:text="@string/time"/>
+                  android:textStyle="bold"
+                  android:textSize="50sp"
+                  android:visibility="invisible"
+                  android:text="@string/falling_word" />
+
+        <Button
+                android:id="@+id/bt_start"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_game"/>
 
     </RelativeLayout>
 
-    <TextView android:id="@+id/tv_falling_word"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:keepScreenOn="true"
-              android:textColor="#33b5e5"
-              android:textStyle="bold"
-              android:textSize="50sp"
-              android:text="@string/falling_word"/>
+    <LinearLayout
+            android:background="@color/black_overlay"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/ll_bottom_container"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-</LinearLayout>
+        <ImageButton
+                android:background="@color/transparent"
+                android:src="@drawable/correct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                android:visibility="gone"
+                android:contentDescription="@string/correct"
+                android:id="@+id/ib_correct"/>
+
+        <ImageButton
+                android:background="@color/transparent"
+                android:src="@drawable/incorrect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:visibility="gone"
+                android:contentDescription="@string/incorrect"
+                android:id="@+id/ib_incorrect"/>
+
+        <TextView android:id="@+id/tv_instructions"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textColor="@android:color/white"
+                  android:textSize="22sp"
+                  android:layout_gravity="center"
+                  android:textAlignment="center"
+                  android:padding="12dp"
+                  android:text="@string/instructions"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
