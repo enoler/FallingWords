@@ -9,6 +9,6 @@
     <string name="instructions">Decide and select if the falling word is the real translation of the word in the top of the screen.</string>
     <string name="points">__POINTS__ points</string>
     <string name="result_label">Result</string>
-    <string name="result_message_succesful">Congratulations! You have had __POINTS__ questions correct! You have passed your exam.</string>
-    <string name="result_message_unsuccesful">Oops! You have had only __POINTS__ questions correct. Next time try harder.</string>
+    <string name="result_message_successful">Congratulations! You have had __POINTS__ questions correct! You have passed your exam.</string>
+    <string name="result_message_unsuccessful">Oops! You have had only __POINTS__ questions correct. Next time try harder.</string>
 </resources>

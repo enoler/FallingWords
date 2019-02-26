@@ -1,6 +1,7 @@
 package es.enoler.babbel.models;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import es.enoler.babbel.R;
 import es.enoler.babbel.helpers.DataHelper;
 import org.json.JSONArray;
@@ -13,9 +14,16 @@ import java.util.Random;
 
 public class FallingWords {
 
+	private static final String TEXT_PLACEHOLDER = "text_";
+
 	private Context mContext;
 	private User mUser;
+
 	private ArrayList<HashMap<String, String>> allWords;
+
+	private int points;
+	private int questionIndex;
+	private boolean isAnsweredQuestion;
 
 	private String userLanguageKey;
 	private String learningLanguageKey;
@@ -25,11 +33,14 @@ public class FallingWords {
 	public FallingWords(Context context, User user) {
 		mContext = context;
 		mUser = user;
+		isAnsweredQuestion = false;
 
 		// I don't like so much the solution below, very vulnerable to errors.
 		// The language of the user has to be the same string than the key.
-		userLanguageKey = "text_" + mUser.getUserLanguage();
-		learningLanguageKey = "text_" + mUser.getLearningLanguage();
+		userLanguageKey = TEXT_PLACEHOLDER + mUser.getUserLanguage();
+		learningLanguageKey = TEXT_PLACEHOLDER + mUser.getLearningLanguage();
+		points = -1;
+		questionIndex = 0;
 
 		this.allWords = readAllWords();
 	}
@@ -100,5 +111,29 @@ public class FallingWords {
 		}
 
 		return allWords;
+	}
+
+	public int getPoints() {
+		return points;
+	}
+
+	public void setPoints(int points) {
+		this.points = points;
+	}
+
+	public int getQuestionIndex() {
+		return questionIndex;
+	}
+
+	public void setQuestionIndex(int questionIndex) {
+		this.questionIndex = questionIndex;
+	}
+
+	public boolean isAnsweredQuestion() {
+		return isAnsweredQuestion;
+	}
+
+	public void setAnsweredQuestion(boolean answeredQuestion) {
+		isAnsweredQuestion = answeredQuestion;
 	}
 }

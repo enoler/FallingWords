@@ -25,8 +25,7 @@ import es.enoler.babbel.models.User;
 import java.util.ArrayList;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * Screen of the FallingWords game.
  */
 public class GameActivity extends AppCompatActivity {
 
@@ -41,18 +40,18 @@ public class GameActivity extends AppCompatActivity {
 	private static final String USER_LANGUAGE = "spa";
 	private static final String LEARNING_LANGUAGE = "eng";
 	private static final String USER_NAME = "Enol";
-	private static final String POINTS_PLACEHOLDER = "__POINTS__";
-	private final int NUMBER_QUESTIONS = 10;
 	private final int RESPONSE_TIME_MILLISECONDS = 10000;
 	private final int SUCCESFUL_EDGE = 5;
+	private final int NUMBER_QUESTIONS = 10;
+
+	private static final String POINTS_PLACEHOLDER = "__POINTS__";
 
 	private final Handler mHideHandler = new Handler();
-	private static Boolean answeredQuestion = false;
 	private User mUser;
 	private View mContentView;
 	private ArrayList<Question> mQuestions;
-	private int mPoints;
-	private int mQuestionIndex;
+	private FallingWords mGame;
+	private CountDownTimer mCounterDown;
 
 	private TextView tvTime;
 	private TextView tvPoints;
@@ -81,16 +80,18 @@ public class GameActivity extends AppCompatActivity {
 		ibCorrect.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mQuestionIndex < NUMBER_QUESTIONS)
-					selectResponse(mQuestions.get(mQuestionIndex).isCorrectTranslated());
+				int index = mGame.getQuestionIndex();
+				if(index < NUMBER_QUESTIONS)
+					selectResponse(mQuestions.get(index).isCorrectTranslated());
 			}
 		});
 
 		ibIncorrect.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mQuestionIndex < NUMBER_QUESTIONS)
-					selectResponse(!mQuestions.get(mQuestionIndex).isCorrectTranslated());
+				int index = mGame.getQuestionIndex();
+				if(index < NUMBER_QUESTIONS)
+					selectResponse(!mQuestions.get(index).isCorrectTranslated());
 			}
 		});
 	}
@@ -109,7 +110,7 @@ public class GameActivity extends AppCompatActivity {
 	 * @param isCorrect If the answer was correct or not.
 	 */
 	private void selectResponse(boolean isCorrect) {
-		answeredQuestion = true;
+		mGame.setAnsweredQuestion(true);
 		if(isCorrect) {
 			tvFallingWord.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.succesful));
 			incrementPoint();
@@ -125,12 +126,14 @@ public class GameActivity extends AppCompatActivity {
 		}, 300);
 	}
 
+	/**
+	 * Animation for the falling word.
+	 */
 	private void animateObject() {
 		tvFallingWord.setTranslationY(0);
 		ObjectAnimator animation =
 				ObjectAnimator.ofFloat(tvFallingWord, "translationY",
-						((ViewGroup) tvFallingWord.getParent()).getHeight()
-				- tvFallingWord.getHeight());
+						((ViewGroup) tvFallingWord.getParent()).getHeight());
 		animation.setInterpolator(new LinearInterpolator());
 		animation.setDuration(10000);
 		animation.start();
@@ -141,7 +144,7 @@ public class GameActivity extends AppCompatActivity {
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				if (!answeredQuestion) changeQuestion();
+				if (!mGame.isAnsweredQuestion()) changeQuestion();
 			}
 
 			@Override
@@ -150,43 +153,56 @@ public class GameActivity extends AppCompatActivity {
 			@Override
 			public void onAnimationRepeat(Animator animation) { }
 		});
-		answeredQuestion = false;
+		mGame.setAnsweredQuestion(false);
 	}
 
 	/**
 	 * Change the question if there is still more. Otherwise, it finish the game.
 	 */
 	private void changeQuestion() {
-		startCountdown();
-		mQuestionIndex++;
-		if(mQuestionIndex < NUMBER_QUESTIONS) {
-			tvSuggestedWord.setText(mQuestions.get(mQuestionIndex).getUserLanguageWord());
-			tvFallingWord.setText(mQuestions.get(mQuestionIndex).getLearningLanguageWord());
+		startCounterDown();
+
+		int index = mGame.getQuestionIndex() + 1;
+		mGame.setQuestionIndex(index);
+		if(index < NUMBER_QUESTIONS) {
+			tvSuggestedWord.setText(mQuestions.get(index).getUserLanguageWord());
+			tvFallingWord.setText(mQuestions.get(index).getLearningLanguageWord());
 			animateObject();
 		} else onFinishGame();
 	}
 
 	private void incrementPoint(){
-		String startingPoints = getString(R.string.points).replace(POINTS_PLACEHOLDER, Integer.toString(++mPoints));
+		mGame.setPoints(mGame.getPoints() + 1);
+		String startingPoints = getString(R.string.points)
+				.replace(POINTS_PLACEHOLDER, Integer.toString(mGame.getPoints()));
 		tvPoints.setText(startingPoints);
 	}
 
+	private CountDownTimer initCountdown() {
+		return new CountDownTimer(RESPONSE_TIME_MILLISECONDS, 1000) {
+			public void onTick(long millisUntilFinished) {
+				tvTime.setText(Long.toString(millisUntilFinished / 1000));
+			}
+
+			public void onFinish() { }
+		};
+	}
+
 	/**
-	 * Reset paramenters and read new random questions.
+	 * Reset parameters and read new random questions.
 	 */
 	private void initGame() {
 		// Initialize game.
-		FallingWords game = new FallingWords(this, mUser);
-		mQuestions = game.getQuestions(NUMBER_QUESTIONS);
-		mPoints = -1;
-		mQuestionIndex = 0;
+		mGame = new FallingWords(this, mUser);
+		mQuestions = mGame.getQuestions(NUMBER_QUESTIONS);
 
 		// Start in 0.
 		incrementPoint();
+		startCounterDown();
 
 		// Initial words.
-		tvSuggestedWord.setText(mQuestions.get(mQuestionIndex).getUserLanguageWord());
-		tvFallingWord.setText(mQuestions.get(mQuestionIndex).getLearningLanguageWord());
+		tvSuggestedWord.setText(mQuestions.get(mGame.getQuestionIndex()).getUserLanguageWord());
+		tvFallingWord.setText(mQuestions.get(mGame.getQuestionIndex()).getLearningLanguageWord());
 		animateObject();
 	}
 
@@ -229,11 +245,11 @@ public class GameActivity extends AppCompatActivity {
 
 		// Customize message depending on the result.
 		int resultMessageId;
-		if(mPoints >= SUCCESFUL_EDGE) resultMessageId = R.string.result_message_succesful;
-		else resultMessageId = R.string.result_message_unsuccesful;
+		if(mGame.getPoints() >= SUCCESFUL_EDGE) resultMessageId = R.string.result_message_successful;
+		else resultMessageId = R.string.result_message_unsuccessful;
 
 		String resultMessage = getString(resultMessageId)
-				.replace(POINTS_PLACEHOLDER, Integer.toString(mPoints));
+				.replace(POINTS_PLACEHOLDER, Integer.toString(mGame.getPoints()));
 		alertDialog.setMessage(resultMessage);
 
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok),
@@ -255,16 +271,12 @@ public class GameActivity extends AppCompatActivity {
 		tvSuggestedWord.setText(getString(R.string.falling_word));
 	}
 
-	private void startCountdown() {
-		new CountDownTimer(RESPONSE_TIME_MILLISECONDS, 1000) {
-
-			public void onTick(long millisUntilFinished) {
-				tvTime.setText(Long.toString(millisUntilFinished / 1000));
-			}
-
-			public void onFinish() { }
-
-		}.start();
+	/**
+	 * Restart the counter and invalidate the previous one if it was still running.
+	 */
+	private void startCounterDown() {
+		if(mCounterDown != null) mCounterDown.cancel();
+		mCounterDown = initCountdown().start();
 	}
 
 	//region Full screen setup
